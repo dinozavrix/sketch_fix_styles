@@ -1,0 +1,233 @@
+var full_info_shape;
+var full_title_shape;
+var full_info_text;
+var full_title_text;
+
+var onRun = function(context) {
+	var doc = context.document;
+	var app = [NSApplication sharedApplication];
+	fix(context);
+	doc.showMessage(full_title_shape);
+	fix(context,true);
+	doc.showMessage(full_title_text);
+	[app displayDialog:full_info_shape withTitle:full_title_shape];
+	[app displayDialog:full_info_text withTitle:full_title_text];
+	onClear(context);
+}
+
+var onCheck = function(context) {
+	var doc = context.document;
+	var app = [NSApplication sharedApplication];
+	fix(context,false,true);
+	doc.showMessage(full_title_shape);
+	fix(context,true,true);
+	doc.showMessage(full_title_text);
+	[app displayDialog:full_info_shape withTitle:full_title_shape];
+	[app displayDialog:full_info_text withTitle:full_title_text];
+}
+
+var onClear = function(context) {
+	var app = [NSApplication sharedApplication];
+	var doc = context.document;
+	var sharedStyleObjects = NSArray.alloc();
+	sharedStyleObjects = doc.documentData().layerStyles().objects();
+	//delete all empty name styles
+	var info=0;
+    for (var i = 0; i < sharedStyleObjects.count(); i++) {
+      var sharedStyle = sharedStyleObjects.objectAtIndex(i);
+      //log (sharedStyle.name().toString());
+      if (sharedStyle.name().toString().search(" ~ ")==0) 
+      	{
+      		sharedStyleObjects.removeObjectAtIndex(i);
+      		i=0;
+      		info++;
+      	}
+    }
+    var infot=0;
+	sharedStyleObjects = doc.documentData().layerTextStyles().objects();
+	//delete all empty name styles
+    for (var i = 0; i < sharedStyleObjects.count(); i++) {
+      var sharedStyle = sharedStyleObjects.objectAtIndex(i);
+      if (sharedStyle.name().toString().search(" ~ ")==0) 
+      	{
+      		//context.document.reloadInspector();
+      		sharedStyleObjects.removeObjectAtIndex(i);
+      		i=0;
+      		//context.document.reloadInspector();
+      		infot++;
+      	}
+    }
+    context.document.reloadInspector();
+    [app displayDialog:"Have a nice day!" withTitle:"Deleted shape styles: "+info+"\nDeleted text styles: "+infot];
+
+
+
+}
+
+var fix = function(context,isText,check) {
+	var info="";
+	var app = [NSApplication sharedApplication];
+	var doc = context.document;
+	var sharedStyleObjects = NSArray.alloc();
+	var sharedStyleArr=[];
+	var sharedStyleId=[];
+	var sharedStyleToId=[];
+	var sharedStyleReplace=[];
+	sharedStyleObjects = doc.documentData().layerStyles().objects();
+	if (isText) sharedStyleObjects = doc.documentData().layerTextStyles().objects();
+	
+	//delete all empty name styles
+    for (var i = 0; i < sharedStyleObjects.count(); i++) {
+      var sharedStyle = sharedStyleObjects.objectAtIndex(i);
+      if (sharedStyle.name()==null){
+       	sharedStyleObjects.removeObjectAtIndex(i);
+       	i=0;
+  		}
+    }
+    context.document.reloadInspector();
+    
+    for (var i = 0; i < sharedStyleObjects.count(); i++) {
+      var sharedStyle = sharedStyleObjects.objectAtIndex(i);
+      found=false;
+      for (var j = 0; j < i; j++){
+      	//log(sharedStyle.name()+"&"+sharedStyleArr[j]+sharedStyleArr[j]+sharedStyleArr[j]+"="+(sharedStyle.name().toString().localeCompare(sharedStyleArr[j].toString())))
+      	if (sharedStyle.name().toString().localeCompare(sharedStyleArr[j].toString())==0){
+      		found=true;
+      		//[app displayDialog:sharedStyle.name() withTitle:"Alert Box Title"];
+      		//j = sharedStyleArr.length
+      		sharedStyleReplace.push([j,sharedStyle.objectID(), sharedStyleId[j], sharedStyle.name()]);
+      		info+=sharedStyle.name()+"\n";
+      		if (!check){
+	      		sharedStyle.setName(" ~ "+sharedStyle.name());
+	      		//sharedStyleObjects.removeObjectAtIndex(i);
+      		}
+	      	//log ()
+	      	
+      		//delete sharedStyleObjects
+      		break;
+      	}
+      }
+      sharedStyleArr[i]=sharedStyle.name();
+      sharedStyleId[i]=sharedStyle.objectID();
+      if (!found){
+      	//sharedStyleArr.push (sharedStyle.name())
+      	//sharedStyleReplace[i]=sharedStyleId[j];
+      }
+	}
+  var text=""
+  for (var j = 0; j < sharedStyleArr.length; j++){
+		text+=sharedStyleArr[j]+", "+sharedStyleId[j]+"\n";
+  }
+	
+	//[app displayDialog:sharedStyleReplace withTitle:"Alert Box Title"];
+	log(text);
+	log(sharedStyleReplace);
+	log(doc.currentPage().children().count());
+	count=0;
+	doc.showMessage("Total objects: " +doc.currentPage().children().count());
+	//return;
+	for (var i = 0; i < doc.currentPage().children().count(); i++) {
+      var layer = doc.currentPage().children().objectAtIndex(i);
+      if (layer.style && layer.style().sharedObjectID() != null) {
+      				//log (i+":"+layer.name()+layer.style().sharedObjectID())
+      				for (j=0;j<sharedStyleReplace.length;j++){
+      					//log (i+","+j+":"+layer.style().sharedObjectID()+"="+sharedStyleReplace[j][1])
+      					//log((layer.style().sharedObjectID().toString+"=="+sharedStyleReplace[j][1].toString))
+      					//layer.style().sharedObjectID().toString==sharedStyleReplace[j][1].toString
+      					if (layer.style().sharedObjectID().toString().localeCompare(sharedStyleReplace[j][1].toString())==0){
+      						if (!check){
+      							layer.style().setSharedObjectID(sharedStyleReplace[j][2]);
+      						}
+      						//[app displayDialog:sharedStyleReplace[j,1]+sharedStyleReplace[j,2] withTitle:"Alert Box Title"];
+      						//log (i+","+j+":"+layer.style().sharedObjectID()+"="+sharedStyleReplace[j][1])
+      						//log (layer.name()+" : "+sharedStyleReplace[j][1]+"->"+sharedStyleReplace[j][2]+" : "+sharedStyleReplace[j][3]);
+      						count++;
+      						//break;
+      						//log (layer.name()+" : "+layer.style().sharedObjectID().toString()+"->"+sharedStyleReplace[j][1].toString())
+      					}
+      				}
+      				
+                }
+
+}
+context.document.reloadInspector();
+
+var changed="Found";
+if (!check) changed="Changed";
+
+
+
+if (!isText){
+	//[app displayDialog:info withTitle:changed+" "+count+" shape styles, with styles:"];
+	full_info_shape=info;
+	full_title_shape=changed+" "+count+" shape styles, with styles:";
+}
+	else{
+	//[app displayDialog:info withTitle:changed+" "+count+" text styles, with styles:"];
+	full_info_text=info;
+	full_title_text=changed+" "+count+" text styles, with styles:";
+}
+
+
+};
+
+
+
+
+
+
+
+
+
+/*
+
+var text=""
+
+
+sharedStyleObjects = doc.documentData().layerStyles().objects();
+    for (var i = 0; i < sharedStyleObjects.count(); i++) {
+      var sharedStyle = sharedStyleObjects.objectAtIndex(i);
+      text+=(sharedStyle.objectID())+" ("+sharedStyle.name()+")\n"
+       //print(sharedStyle.name())
+}
+//var cnt=doc.currentPage().children().count()
+//var cnt="tets"
+//doc.showMessage(cnt.toString());
+//[app displayDialog:text withTitle:"Alert Box Title"];
+//doc.showMessage("df")
+var ids=""
+ for (var i = 0; i < doc.currentPage().children().count(); i++) {
+      var layer = doc.currentPage().children().objectAtIndex(i);
+      //ids+=layer.style()+"\n"
+      if ([layer isKindOfClass: MSShapeGroup] && layer.style()
+                    .sharedObjectID() != null) {
+      				ids=ids+i+"="+layer.name()+"="+layer.style().sharedObjectID()+"\n";
+      				layer.style().setSharedObjectID("B220B18E-F34D-4F73-9A96-BC9974E1E543");
+      				//layer.ResetSharedStyle();
+      				//synchroniseInstancesOfSharedObject_withInstance()
+      				//[app displayDialog:layer.style().tests() withTitle:"Alert Box Title"];
+      				context.document.reloadInspector();
+
+                    //[app displayDialog:i withTitle:"Alert Box Title"];
+                }
+        //if (layer.style().sharedObjectID()=="F4EDA26E-E34A-4D5E-960A-89D6986225FA")
+      //	 [app displayDialog:i withTitle:"Alert Box Title"];
+      //print(sharedStyle.objectID())
+       //print(sharedStyle.name())
+}
+[app displayDialog:ids withTitle:"Alert Box Title"];
+
+
+
+
+
+};
+
+
+/*function getLayersByLayerStyle (layerStyle, scope) {
+    var predicate = NSPredicate.predicateWithFormat("(style.fill != NULL) && (FUNCTION(style.fill, 'isEqualForSync:asPartOfSymbol:', %@, nil) == YES)", layerStyle.fill());
+    // query page layers
+    var queryResult = scope.filteredArrayUsingPredicate(predicate);
+
+    return queryResult;
+}*/

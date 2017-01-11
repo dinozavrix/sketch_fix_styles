@@ -1,0 +1,34 @@
+{
+  "author" : "",
+  "commands" : [
+    {
+      "script" : "script.cocoascript",
+      "name" : "Remove duplicates",
+      "handlers" : {
+        "run" : "onRun"
+      },
+      "identifier" : "com.bohemiancoding.sketch.runscriptidentifier"
+    },
+    {
+      "script" : "script.cocoascript",
+      "name" : "Check for duplicates",
+      "handlers" : {
+        "run" : "onCheck"
+      },
+      "identifier" : "com.bohemiancoding.sketch.runscriptidentifier_test"
+    }
+
+  ],
+  "menu" : {
+    "items" : [
+      "com.bohemiancoding.sketch.runscriptidentifier_test",
+      "com.bohemiancoding.sketch.runscriptidentifier"
+    ],
+    "title" : "Remove duplicated styles"
+  },
+  "identifier" : "com.example.sketch.2899bc59-a313-42ab-908b-a70264fd0420",
+  "version" : "1.0",
+  "description" : "",
+  "authorEmail" : "",
+  "name" : "styles fix"
+}
