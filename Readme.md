@@ -1,4 +1,4 @@
-# To remove duplicate styles in Sketch
+# Remove duplicate styles in Sketch
 
 ## BETA Version
 
