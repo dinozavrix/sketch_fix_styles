@@ -3,7 +3,7 @@
 ## BETA Version
 
 
-Styles are duplicates when you copy objects with the same styles from different files. The script finds duplicate style names, changes style to first instance, and delete copies. 
+Styles duplicate when you copy objects with the same styles from different files. The script finds duplicate style names, changes style to first instance, and delete copies. 
 
 The plugin fixes the styles names only and don't change the real properties (don't synchronize them) so all styles with the same names should have the same properties.
 
