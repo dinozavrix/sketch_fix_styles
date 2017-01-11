@@ -13,4 +13,4 @@ Please backup your .sketch file before use
 
 
 ## Before and After Demo
-(https://raw.githubusercontent.com/dinozavrix/sketch_fix_styles/master/demo.png)
+![Before and After Demo](https://raw.githubusercontent.com/dinozavrix/sketch_fix_styles/master/demo.png)
